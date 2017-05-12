@@ -15,7 +15,6 @@ void setup() {
   pinMode(RIn2, OUTPUT);
   pinMode(LIn3, OUTPUT);
   pinMode(LIn4, OUTPUT);
-  
 }
 
 void loop() {
