@@ -16,7 +16,7 @@ bool forward = true;
 //the threshold for 
 int thresh = 200;
 //constant to convert diff to PWM amount
-int ratio  = 1;
+int ratio  = 3;
 
 int originalDifference = 0;
 
@@ -52,14 +52,14 @@ void loop() {
   int diff = getDifference();
   if(diff > thresh){ //THE SEA BE BRINGING HER WORST!!!
     //BRING HER PORTSIDE!!!
-    analogWrite(REnable, MAX_SPEED - (diff * ratio));
+    analogWrite(REnable, constrain(MAX_SPEED - (diff * ratio), 0, 255));
     analogWrite(LEnable, MAX_SPEED);
     //AY AY CAPTAIN!!!
     
-  } else if(diff < (-1 * thresh)){ //GIMME YOUR BEST YOU LAND LUBBERS!!!
+  } else if(thresh < (-1 * diff)){ //GIMME YOUR BEST YOU LAND LUBBERS!!!
     //VEER HER STARBOARD!!!
     analogWrite(REnable, MAX_SPEED);
-    analogWrite(LEnable, MAX_SPEED + (diff * ratio)); //Note that diff is negative
+    analogWrite(LEnable, constrain(MAX_SPEED + (diff * ratio), 0, 255)); //Note that diff is negative
     //AY AY CAPTAIN!!!
   } else { //PREPARE TO BOARD, YOU BILGE RATS!!!
     //FULL SPEED AHEAD!!!
