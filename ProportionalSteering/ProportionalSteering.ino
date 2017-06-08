@@ -1,5 +1,5 @@
-int REnable = 5;
-int LEnable = 6;
+int REnable = 6;
+int LEnable = 5;
 
 int RIn1 = 4;
 int RIn2 = 3;
@@ -9,14 +9,14 @@ int LIn4 = 8;
 int leftLED = A1;
 int rightLED = A0;
 
-int MAX_SPEED = 175;
-
+int MAX_SPEED = 125;
+int SPEED_DIFF = 10;
 bool forward = true;
 
 //the threshold for 
-int thresh = 200;
+int thresh = 50;
 //constant to convert diff to PWM amount
-int ratio  = 3;
+int ratio  = 1;
 
 int originalDifference = 0;
 
@@ -40,11 +40,12 @@ void setup() {
   analogWrite(REnable, MAX_SPEED);
   analogWrite(LEnable, MAX_SPEED);
   //AY AY CAPTAIN!!!
-  //originalDifference = getDifference();
+  originalDifference = getDifference();
 }
 
 int getDifference() {
-  return analogRead(leftLED) - analogRead(rightLED) +  originalDifference;
+  //return map(analogRead(leftLED), 470, 1023, 500, 1023) - map(analogRead(rightLED), 320, 1023, 500, 1023) +  originalDifference;
+  return analogRead(leftLED) - analogRead(rightLED) -  originalDifference;
 }
 
 void loop() {
@@ -52,25 +53,29 @@ void loop() {
   int diff = getDifference();
   if(diff > thresh){ //THE SEA BE BRINGING HER WORST!!!
     //BRING HER PORTSIDE!!!
-    analogWrite(REnable, constrain(MAX_SPEED - (diff * ratio), 0, 255));
-    analogWrite(LEnable, MAX_SPEED);
+    //analogWrite(REnable, constrain(MAX_SPEED - (diff * ratio) - SPEED_DIFF, 0, 255));
+    analogWrite(REnable, 0);
+    analogWrite(LEnable, MAX_SPEED + SPEED_DIFF);
     //AY AY CAPTAIN!!!
     
   } else if(thresh < (-1 * diff)){ //GIMME YOUR BEST YOU LAND LUBBERS!!!
     //VEER HER STARBOARD!!!
-    analogWrite(REnable, MAX_SPEED);
-    analogWrite(LEnable, constrain(MAX_SPEED + (diff * ratio), 0, 255)); //Note that diff is negative
+    analogWrite(REnable, MAX_SPEED - SPEED_DIFF);
+    //analogWrite(LEnable, constrain(MAX_SPEED + (diff * ratio), 0, 255)); //Note that diff is negative
+    analogWrite(LEnable, 0); //Note that diff is negative
     //AY AY CAPTAIN!!!
   } else { //PREPARE TO BOARD, YOU BILGE RATS!!!
     //FULL SPEED AHEAD!!!
     analogWrite(REnable, MAX_SPEED);
-    analogWrite(LEnable, MAX_SPEED);
+    analogWrite(LEnable, MAX_SPEED + SPEED_DIFF);
     //AY AY CAPTAIN!!!
   }
   //LET THE CREW REST!!!
   Serial.print("Sensor 1: ");
-  Serial.print(analogRead(leftLED));
+  Serial.print(analogRead(leftLED));//470
   Serial.print("   |||   Sensor 2: ");
-  Serial.println(analogRead(rightLED));
+  Serial.println(analogRead(rightLED)); //320
+  Serial.print("DIFF: ");
+  Serial.println(getDifference());
   delay(1);
 }
